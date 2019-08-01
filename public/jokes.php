@@ -1,18 +1,15 @@
 <?php
 
 try {
-	$pdo = new PDO('mysql:host=localhost;dbname=ninja_jokes; charset=utf8', 'ninja', 'ninja');
 	
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-	$sql = 'SELECT `joketext`,`joke`.`id`, `name`, `email` FROM `joke`
-					INNER JOIN `author` ON `authorid` = `author`.`id`';
-
-	$results = $pdo->query($sql);
-
-	$jokes = $results;
+	include __DIR__ . '/../includes/DatabaseConnection.php';
+	include __DIR__ . '/../includes/DatabaseFunctions.php';
+	
+	$jokes = allJokes($pdo);
 
 	$title = 'Joke List';
+
+	$totalJokes = totalJokes($pdo);
 
 	ob_start();
 

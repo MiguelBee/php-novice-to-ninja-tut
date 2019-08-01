@@ -2,19 +2,17 @@
 
 if(isset($_POST['joketext'])){
 	try{
-		$pdo = new PDO('mysql:host=localhost;dbname=ninja_jokes; charset=utf8', 'ninja', 'ninja');
-	
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		
+	include __DIR__ . '/../includes/DatabaseConnection.php';
+	include __DIR__ . '/../includes/DatabaseFunctions.php';
 
+		/* Other type of sql setting statement, use VALUES instead
 		$sql = 'INSERT INTO `joke` SET
 						`joketext` = :joketext,
 						`jokedate` = CURDATE()';
+		*/
 
-		$stmt = $pdo->prepare($sql);
-
-		$stmt->bindValue(':joketext', $_POST['joketext']);
-
-		$stmt->execute();
+		insertJoke($pdo, $_POST['joketext'], 1);
 
 		header('location: jokes.php');
 
