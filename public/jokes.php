@@ -1,15 +1,30 @@
 <?php
 
+include __DIR__ . '/../includes/DatabaseConnection.php';
+include __DIR__ . '/../includes/DatabaseFunctions.php';
+
 try {
 	
-	include __DIR__ . '/../includes/DatabaseConnection.php';
-	include __DIR__ . '/../includes/DatabaseFunctions.php';
-	
-	$jokes = allJokes($pdo);
+	$results = findAll($pdo, 'joke');
+
+	$jokes = [];
+
+	foreach($results as $joke){
+		$author = findById($pdo, 'author', 'id', $joke['authorid']);
+
+#looping through a table and adding by id is essentially what an inner join does in MYSQL
+		$jokes[] = [
+			'id' => $joke['id'],
+			'joketext' => $joke['joketext'],
+			'jokedate' => $joke['jokedate'],
+			'name' => $author['name'],
+			'email' => $author['email']
+		];
+	}
 
 	$title = 'Joke List';
 
-	$totalJokes = totalJokes($pdo);
+	$totalJokes = total($pdo, 'joke');
 
 	ob_start();
 
