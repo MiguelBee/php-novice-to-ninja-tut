@@ -46,9 +46,11 @@ nav li {
 }
 
 main {
-	overflow: auto; min-height: 30vh; 
+	overflow: auto;
+	height: auto; 
 	background-color: #f7f7f7; 
-	width: 1000px; margin: auto; 
+	width: 1000px;
+	margin: auto; 
 	box-shadow: -1000px 0 0 #f7f7f7, 1000px 0 0 #f7f7f7; 
 	padding-top: 20px;
 }

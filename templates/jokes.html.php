@@ -14,11 +14,17 @@
 				?>)
 		<pre>
 		</pre> 
-		<a href="editjoke.php?id=<?=$joke['id']?>">Edit</a>
-		<form action='deletejoke.php' method="post">
+		<a href="index.php?action=edit&id=<?=$joke['id']?>">Edit</a>
+		<form action='index.php?action=delete' method="post" onclick="areYouSure()">
 			<input type="hidden" name='id' value="<?= $joke['id']?>">
 			<input type="submit" value="Delete">
 		</form>
 		</p>
 	</blockquote>
 <?php endforeach; ?>
+
+<script>
+	function areYouSure(){
+		confirm('Are You Sure?');
+	}
+</script>
