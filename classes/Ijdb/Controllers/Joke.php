@@ -1,6 +1,9 @@
 <?php
 
-class JokesController {
+namespace Ijdb\Controllers;
+use \NInja\DatabaseTable;
+
+class Joke {
 	private $authorsTable;
 	private $jokesTable;
 
@@ -48,32 +51,31 @@ class JokesController {
 	public function delete(){
 		$this->jokesTable->delete($_POST['id']);
 
-		header('location: index.php?action=list');
+		header('location: index.php?route=joke/list');
 	}
 
-	public function edit(){
-		if(isset($_POST['joke'])){
-	
-			$joke = $_POST['joke'];
-			$joke['authorid'] = 1;
-			$joke['jokedate'] = new DateTime();
+	public function saveEdit(){
+		$joke = $_POST['joke'];
+		$joke['authorid'] = 1;
+		$joke['jokedate'] = new \DateTime();
 
-			$this->jokesTable->save($joke);
+		$this->jokesTable->save($joke);
 
-			header('location: index.php?action=list');
-		} else {
+		header('location: index.php?route=joke/list');
+	} 
+
+	public function edit() {
 		
-			if(isset($_GET['id'])){
-				$joke = $this->jokesTable->findById($_GET['id']);
-			}
-			$title = 'Edit Joke';
-
-			return ['template' => 'editjoke.html.php', 'title' => $title,
-							'variables' => [
-								'joke' => $joke ?? null
-							]
-						];
+		if(isset($_GET['id'])){
+			$joke = $this->jokesTable->findById($_GET['id']);
 		}
+		$title = 'Edit Joke';
+
+		return ['template' => 'editjoke.html.php', 'title' => $title,
+						'variables' => [
+							'joke' => $joke ?? null
+						]
+				];
 	}
 
 

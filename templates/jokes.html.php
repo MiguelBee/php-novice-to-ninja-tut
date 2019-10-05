@@ -14,8 +14,8 @@
 				?>)
 		<pre>
 		</pre> 
-		<a href="index.php?action=edit&id=<?=$joke['id']?>">Edit</a>
-		<form action='index.php?action=delete' method="post" onclick="areYouSure()">
+		<a href="index.php?route=joke/edit&id=<?=$joke['id']?>">Edit</a>
+		<form action='index.php?route=joke/delete' method="post" onclick="areYouSure()">
 			<input type="hidden" name='id' value="<?= $joke['id']?>">
 			<input type="submit" value="Delete">
 		</form>
