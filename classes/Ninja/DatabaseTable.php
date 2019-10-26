@@ -2,8 +2,7 @@
 
 namespace Ninja;
 
-class DatabaseTable
-{
+class DatabaseTable{
 	#defined variables can be called directly from inside the methods
 	private $pdo;
 	private $table;
@@ -253,5 +252,15 @@ class DatabaseTable
 		catch (\PDOException $e){
 			$this->update($record);
 		}
+	}
+
+	public function find($column, $value){
+		$query = 'SELECT * FROM ' . $this->table . ' WHERE ' . $column . ' = :value';
+
+		$parameters = ['value' => $value];
+
+		$query = $this->query($query, $parameters);
+
+		return $query->fetchAll();
 	}
 }
