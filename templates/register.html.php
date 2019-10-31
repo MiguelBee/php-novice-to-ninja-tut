@@ -14,7 +14,7 @@
 <?php endif;?>
 <br>
 <br>
-<form action='index.php?route=author/register' method='post'>
+<form action='/author/register' method='post'>
 	<label for='email'> Your Email Address</label>
 	<input name='author[email]' id='email' type='text' value="<?php $author['email'] ?? ''?>" required>
 
