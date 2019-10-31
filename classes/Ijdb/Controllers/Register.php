@@ -60,7 +60,8 @@ class Register
 		//if $valid is still true, then save the author
 		if($valid == TRUE){
 			//hash the password before saving it to the db
-			$author['password'] = password_hash($author['password'], PASSWORD_DEFAULT)
+			$author['password'] = password_hash($author['password'], PASSWORD_DEFAULT);
+			
 			//author now has a lowercase email and hashed password
 			$this->authorsTable->save($author);
 			header('Location: index.php?route=author/success');

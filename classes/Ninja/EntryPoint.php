@@ -18,7 +18,7 @@ class EntryPoint
 	private function checkUrl(){
 		if($this->route !== strtolower($this->route)){
 			http_response_code(301);
-			header('location: index.php?route=' . strtolower($this->route));
+			header('location: ' . strtolower($this->route));
 		}
 	}
 

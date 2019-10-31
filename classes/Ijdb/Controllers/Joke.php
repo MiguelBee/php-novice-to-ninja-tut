@@ -51,7 +51,7 @@ class Joke {
 	public function delete(){
 		$this->jokesTable->delete($_POST['id']);
 
-		header('location: index.php?route=joke/list');
+		header('location: /joke/list');
 	}
 
 	public function saveEdit(){
@@ -61,7 +61,7 @@ class Joke {
 
 		$this->jokesTable->save($joke);
 
-		header('location: index.php?route=joke/list');
+		header('location: /joke/list');
 	} 
 
 	public function edit() {
