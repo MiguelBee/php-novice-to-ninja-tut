@@ -33,6 +33,8 @@ class Register
 		if(empty($author['name'])){
 			$valid = FALSE;
 			$errors[] = "Name cannot be blank";
+		} else {
+			$author['name'] = $author['name'];
 		}
 
 		if(empty($author['email'])){
@@ -64,7 +66,7 @@ class Register
 			
 			//author now has a lowercase email and hashed password
 			$this->authorsTable->save($author);
-			header('Location: index.php?route=author/success');
+			header('Location: /author/success');
 		} else {
 			//if the $valid is not true, show the form again
 			return['template' => 'register.html.php',

@@ -3,7 +3,9 @@
 namespace Ninja;
 
 interface Routes {
-	public function getRoutes();
+	//: array is a form of type hinting to return the correct object
+	public function getRoutes(): array;
+	public function getAuthentication(): \Ninja\Authentication;
 }
 
 //where ever this is 'implemented', that class MUST contain above function

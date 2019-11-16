@@ -14,7 +14,12 @@
 			<li><a href="/">Home</a></li>
 			<li><a href="/joke/list">Jokes List</a></li>
 			<li><a href="/joke/edit">Add a Joke</a></li>
-			<li><a href="/author/register"> Register</a></li>
+			<!-- check if user is logged in -->
+			<?php if($loggedIn): ?>
+				<li><a href="/logout">Log Out</a></li>
+			<?php else: ?>
+				<li><a href="/login">Log In </a></li>
+			<?php endif; ?>
 		</ul>
 	</nav>
 

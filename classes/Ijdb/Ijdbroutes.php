@@ -6,15 +6,24 @@ namespace Ijdb;
 class Ijdbroutes implements \Ninja\Routes
 
 {
-		// dependency injection(vs Service Locator)
-	public  function getRoutes(){
+	private $authorsTable;
+	private $jokestable;
+	private $authentication;
+
+	public function __construct(){
+
 		include __DIR__ . '/../../includes/DatabaseConnection.php';
 
-		$jokesTable = new \Ninja\DatabaseTable($pdo, 'joke', 'id');
-		$authorsTable = new \Ninja\DatabaseTable($pdo, 'author', 'id');
+		$this->jokesTable = new \Ninja\DatabaseTable($pdo, 'joke', 'id');
+		$this->authorsTable = new \Ninja\DatabaseTable($pdo, 'author', 'id');
+		$this->authentication = new \Ninja\Authentication($this->authorsTable, 'email', 'password');
+		// dependency injection(vs Service Locator)
+	}
+	public function getRoutes(): array{
 
-		$jokeController = new \Ijdb\Controllers\Joke($authorsTable, $jokesTable);
-		$authorController = new \Ijdb\Controllers\Register($authorsTable);
+		$jokeController = new \Ijdb\Controllers\Joke($this->authorsTable, $this->jokesTable, $this->authentication);
+		$authorController = new \Ijdb\Controllers\Register($this->authorsTable);
+		$loginController = new \Ijdb\Controllers\Login($this->authentication);
 
 		//create array to call relevant action, removed dependency injection
 		$routes = [
@@ -42,13 +51,15 @@ class Ijdbroutes implements \Ninja\Routes
 				'GET' => [
 					'controller' => $jokeController,
 					'action' =>  'edit'
-				]
+				],
+				'login' => TRUE
 			],
 			'joke/delete' => [
 				'POST' => [
 					'controller' => $jokeController,
 					'action' => 'delete',
-				]
+				],
+				'login' => TRUE
 			],
 			'joke/list' => [
 				'GET' => [
@@ -67,10 +78,42 @@ class Ijdbroutes implements \Ninja\Routes
 					'controller' => $jokeController,
 					'action' => 'home'
 				]
+			],
+			'login' => [
+				'GET' => [
+					'controller' => $loginController,
+					'action' => 'loginForm'
+				],
+				'POST' => [
+					'controller' => $loginController,
+					'action' => 'processLogin'
+				]
+			],
+			'login/success' => [
+				'GET' => [
+					'controller' => $loginController,
+					'action' => 'success'
+				]
+			],
+			'login/error' => [
+				'GET' => [
+					'controller' => $loginController,
+					'action' => 'error'
+				]
+			],
+			'logout' => [
+				'GET' => [
+					'controller' => $loginController,
+					'action' => 'logout'
+				]
 			]
 		];
 
 		return $routes;
 
+	}
+
+	public function getAuthentication(): \Ninja\Authentication {
+		return $this->authentication;
 	}
 }
