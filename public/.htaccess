@@ -1,5 +1,5 @@
 
-ReWriteEngine on
-ReWriteCond %{REQUEST_FILENAME} !-f
-ReWriteCond %{REQUEST_FILENAME} !-d
-ReWriteRule ^.*$ index.php [NC,L,QSA]
+RewriteEngine on 
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteRule ^.*$ /index.php [NC,L,QSA]
