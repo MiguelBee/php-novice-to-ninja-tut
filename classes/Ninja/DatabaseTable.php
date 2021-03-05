@@ -7,11 +7,16 @@ class DatabaseTable{
 	private $pdo;
 	private $table;
 	private $primaryKey;
+	private $className;
+	private $constructorArgs;
 
-	public function __construct(\PDO $pdo, string $table, string $primaryKey){
+	public function __construct(\PDO $pdo, string $table, string $primaryKey,
+	 string $className = '\stdclass', array $constructorArgs = []){
 		$this->pdo = $pdo;
 		$this->table = $table;
 		$this->primaryKey = $primaryKey;
+		$this->className = $className;
+		$this->constructorArgs = $constructorArgs;
 	}
 
 	private function query($sql, $parameters = []){
@@ -45,7 +50,7 @@ class DatabaseTable{
 
 		$query = $this->query($sql, $parameters);
 
-		return $query->fetch();
+		return $query->fetchObject($this->className, $this->constructorArgs);
 	}
 	/**
 	function getJoke($pdo, $id){
@@ -84,6 +89,8 @@ class DatabaseTable{
 		$fields = $this->processDates($fields);
 
 		$this->query($query, $fields);
+
+		return $this->pdo->lastInsertId();
 	}
 
 	/**
@@ -170,7 +177,7 @@ class DatabaseTable{
 
 		$results = $this->query($sql);
 
-		return $results->fetchAll(); 
+		return $results->fetchAll(\PDO::FETCH_CLASS, $this->className, $this->constructorArgs); 
 	}
 
 	/**
@@ -243,15 +250,32 @@ class DatabaseTable{
 	}
 
 	public function save($record){
+		$entity = new $this->className(...$this->constructorArgs);
 		try{
 			if($record[$this->primaryKey] == ''){
 				$record[$this->primaryKey] = null;
 			}
-			$this->insert($record);
+			$insertId = $this->insert($record);
+
+			$entity->{$this->primaryKey} = $insertId;
+			//curly brackets use
+			// same as:
+			// $primaryKey = $this->primaryKey;
+			// $entity->$primaryKey = $insertId;
+
 		}
 		catch (\PDOException $e){
 			$this->update($record);
 		}
+
+		foreach($record as $key => $value) {
+			// Converting an array into an object
+			if (!empty($value)) {
+				$entity->$key = $value;
+			}
+		}
+
+		return $entity;
 	}
 
 	public function find($column, $value){
@@ -261,6 +285,17 @@ class DatabaseTable{
 
 		$query = $this->query($query, $parameters);
 
-		return $query->fetchAll();
+		return $query->fetchAll(\PDO::FETCH_CLASS, $this->className, $this->constructorArgs);
+	}
+
+	// For deleting, then re-adding jokes to class, chpt:13
+	public function deleteWhere($column, $value) {
+		$sql = 'DELETE FROM ' . $this->table . ' WHERE ' . $column . ' = :value';
+
+		$parameters = [
+			'value' => $value
+		];
+
+		$query = $this->query($sql, $parameters);
 	}
 }

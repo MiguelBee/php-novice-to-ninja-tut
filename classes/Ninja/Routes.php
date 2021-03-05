@@ -6,6 +6,7 @@ interface Routes {
 	//: array is a form of type hinting to return the correct object
 	public function getRoutes(): array;
 	public function getAuthentication(): \Ninja\Authentication;
+	public function checkPermission($permission): bool;
 }
 
 //where ever this is 'implemented', that class MUST contain above function

@@ -7,12 +7,14 @@ use \Ninja\Authentication;
 class Joke {
 	private $authorsTable;
 	private $jokesTable;
-	#private $authentication;
+	private $categoriesTable;
+	private $authentication;
 
 
-	public function __construct(DatabaseTable $authorsTable, DatabaseTable $jokesTable, Authentication $authentication){
+	public function __construct(DatabaseTable $authorsTable, DatabaseTable $jokesTable, DatabaseTable $categoriesTable, Authentication $authentication){
 		$this->authorsTable = $authorsTable;
 		$this->jokesTable = $jokesTable;
+		$this->categoriesTable = $categoriesTable;
 		$this->authentication = $authentication;
 	}
 
@@ -23,25 +25,17 @@ class Joke {
 	}
 
 	public function list(){
-		$results = $this->jokesTable->findAll();
-
-		$jokes = [];
-
-		foreach($results as $joke){
-			$author = $this->authorsTable->findById($joke['authorid']);
-
-	#looping through a table and adding by id is essentially what an inner join does in MYSQL
-			$jokes[] = [
-				'id' => $joke['id'],
-				'joketext' => $joke['joketext'],
-				'jokedate' => $joke['jokedate'],
-				'name' => $author['name'],
-				'email' => $author['email'],
-				'authorId' => $author['id']
-			];
+		if (isset($_GET['category'])) {
+			$category = $this->categoriesTable->findById($_GET['category']);
+			$jokes = $category->getJokes();
+		}
+		else {
+			$jokes = $this->jokesTable->findAll();
 		}
 
 		$title = 'Joke List';
+
+		$author = $this->authentication->getUser();
 
 		$totalJokes = $this->jokesTable->total();
 
@@ -49,7 +43,8 @@ class Joke {
 						'variables' => [
 							'totalJokes' => $totalJokes,
 							'jokes' => $jokes,
-							'userId' => $author['id'] ?? null
+							'user' => $author, // previously $userId => $author->id
+							'categories' => $this->categoriesTable->findAll(),
 						]
 					];
 	}
@@ -59,7 +54,7 @@ class Joke {
 
 		$joke = $this->jokesTable->findById($_POST['id']);
 
-		if($joke['authorid'] != $author['id']){
+		if($joke->authorid != $author->id && !$author->hasPermission(\Ijdb\Entity\Author::DELETE_JOKES)){
 			return;
 		}
 		
@@ -71,25 +66,27 @@ class Joke {
 	public function saveEdit(){
 		$author = $this->authentication->getUser();
 
-		if(isset($_GET['id'])){
-			$joke = $this->jokesTable->findById($_GET['id']);
-
-			if($joke['authorid'] != $author['id']){
-				return;
-			}
-		}
+		//this was suggested in book, but doesn work
+		//$authorObject = new \Ijdb\Entity\Author($this->jokesTable);
 
 		$joke = $_POST['joke'];
-		$joke['authorid'] = $author['id'];
 		$joke['jokedate'] = new \DateTime();
+		$joke['authorId'] = $author->id;
 
-		$this->jokesTable->save($joke);
+		$jokeEntity = $author->addJoke($joke);
+
+		$jokeEntity->clearCategories();
+		
+		foreach ($_POST['category'] as $categoryId) {
+			$jokeEntity->addCategory($categoryId);
+		}
 
 		header('location: /joke/list');
 	} 
 
 	public function edit() {
 		$author = $this->authentication->getUser();
+		$categories = $this->categoriesTable->findAll();
 
 		if(isset($_GET['id'])){
 			$joke = $this->jokesTable->findById($_GET['id']);
@@ -99,7 +96,8 @@ class Joke {
 		return ['template' => 'editjoke.html.php', 'title' => $title,
 						'variables' => [
 							'joke' => $joke ?? null,
-							'userId' => $author['id'] ?? null
+							'user' => $author, // replaces userId = $author->id
+							'categories' => $categories
 						]
 				];
 	}
