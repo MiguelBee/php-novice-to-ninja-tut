@@ -33,7 +33,7 @@ class Category {
 	}
 
 	public function list() {
-		$categories = $this->categoriesTable->findAll();
+		$categories = $this->categoriesTable->findAll('jokedate DESC');
 
 		$title = "Joke Categories";
 

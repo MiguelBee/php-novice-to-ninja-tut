@@ -25,26 +25,33 @@ class Joke {
 	}
 
 	public function list(){
+		$page = $_GET['page'] ?? 1;
+
+		$offset = ($page - 1)*10;
+
 		if (isset($_GET['category'])) {
 			$category = $this->categoriesTable->findById($_GET['category']);
-			$jokes = $category->getJokes();
+			$jokes = $category->getJokes(10, $offset);
+			$totalJokes = $category->getNumJokes();
 		}
 		else {
-			$jokes = $this->jokesTable->findAll();
+			$jokes = $this->jokesTable->findAll('jokedate DESC', 10, $offset);
+			$totalJokes = $this->jokesTable->total();
 		}
 
 		$title = 'Joke List';
 
 		$author = $this->authentication->getUser();
 
-		$totalJokes = $this->jokesTable->total();
-
-		return ['template' => 'jokes.html.php', 'title' => $title, 
+		return ['template' => 'jokes.html.php',
+						'title' => $title,
 						'variables' => [
 							'totalJokes' => $totalJokes,
 							'jokes' => $jokes,
 							'user' => $author, // previously $userId => $author->id
 							'categories' => $this->categoriesTable->findAll(),
+							'currentpage' => $page,
+							'category' => $_GET['category'] ?? null
 						]
 					];
 	}
@@ -93,7 +100,8 @@ class Joke {
 		}
 		$title = 'Edit Joke';
 
-		return ['template' => 'editjoke.html.php', 'title' => $title,
+		return ['template' => 'editjoke.html.php',
+						'title' => $title,
 						'variables' => [
 							'joke' => $joke ?? null,
 							'user' => $author, // replaces userId = $author->id

@@ -166,3 +166,14 @@ input[type="checkbox"] + label {
 	display: table-cell;
 	padding: 1em;
 }
+
+.currentpage {
+	background-color: #ffff00;
+}
+.currentpage:before {
+	content: "[";
+}
+
+.currentpage:after {
+	content: "]";
+}

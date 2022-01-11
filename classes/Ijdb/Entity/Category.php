@@ -15,8 +15,8 @@ class Category {
 		$this->jokesCategoryTable = $jokesCategoryTable;
 	}
 
-	public function getJokes(){
-		$jokeCategories = $this->jokesCategoryTable->find('categoryId', $this->id);
+	public function getJokes($limit = null, $offset = null){
+		$jokeCategories = $this->jokesCategoryTable->find('categoryId', $this->id, null, $limit, $offset);
 
 		$jokes = [];
 
@@ -26,7 +26,23 @@ class Category {
 				$jokes[] = $joke;
 			}
 		}
+
+		usort($jokes, [$this, 'sortJokes']);
 		return $jokes;
+	}
+
+	private function sortJokes ($a, $b) {
+		$aDate = new \DateTime($a->jokedate);
+		$bDate = new \DateTime($b->jokedate);
+
+		if ($aDate->getTimestamp() == $bDate->getTimestamp()) {
+			return 0;
+		}
+		return $aDate->getTimestamp() > $bDate->getTimestamp() ? -1 : 1;
+	}
+
+	public function getNumJokes() {
+		return $this->jokesCategoryTable->total('categoryId', $this->id);
 	}
 
 }
